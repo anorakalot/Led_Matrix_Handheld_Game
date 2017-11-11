@@ -111,7 +111,7 @@ void loop() {
   //lc.setLed(0,player_pos,0,true);
   //lc.setLed(
 
-
+  while (checker){
   //PLAYER INPUT CASES
   //move player right
   if (digitalRead(led_input_1) == HIGH){
@@ -122,9 +122,7 @@ void loop() {
     else{
     lc.setLed(0,player_pos,0,false);
     player_pos ++;
-   
     lc.setLed(0,player_pos,0,true);
-    //delay(100);
     }
   }
 
@@ -147,9 +145,7 @@ void loop() {
   
   
   lc.setColumn(0,enemy_level,enemy_bytes[enemy_byte_random]);
-  
   lc.setLed(0,player_pos,0,true);
-
   //NEED THIS
   delay(100);
   
@@ -163,30 +159,57 @@ void loop() {
   }
 
   //COLLISION TESTING
+  
   if (enemy_level == 1){
-    if (enemy_bytes[enemy_byte_random] == B00000011 && player_pos == 7 || player_pos == 8){
-      
+    
+    if (enemy_bytes[enemy_byte_random] == B00000011 && player_pos == 6 || player_pos == 7){
+      game_over();
+      checker = false;
     }
-    if (enemy_bytes[enemy_byte_random] == B00000011 && player_pos == 7 || player_pos == 8){
-      
+    else if (enemy_bytes[enemy_byte_random] == B00000110 && player_pos == 5 || player_pos == 6){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B00001100 && player_pos == 4 || player_pos == 5){
+      game_over();
+      checker = false;
     }
 
-
+    else if (enemy_bytes[enemy_byte_random] == B00011000 && player_pos == 3 || player_pos == 4){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B00110000 && player_pos == 2 || player_pos == 3){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B01100000 && player_pos == 1 || player_pos == 2){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B11000000 && player_pos == 0 || player_pos == 1){
+      game_over();
+      checker = false;
+    }
 
     //end of collision testing
   }
   
-
-
-  
- //end of while loop
-  //}
+    //end of while loop
+  }
   
  //end of void loop
 }
 
+
+void game_over(){
+  lc.writeString(0,"Game Over");
+ 
+}
+
 //TO DO LIST
-//DETECT COLLISION
+//DETECT COLLISION CHECKMATE 
+//
 
 //STRECTCH GOALS
 //POLISH
