@@ -164,8 +164,16 @@ void loop() {
 
   //COLLISION TESTING
   if (enemy_level == 1){
-    //enemy_bytes[enemy_byte_random] == "BB00000011" && player_pos == 7 ||
-  
+    if (enemy_bytes[enemy_byte_random] == B00000011 && player_pos == 7 || player_pos == 8){
+      
+    }
+    if (enemy_bytes[enemy_byte_random] == B00000011 && player_pos == 7 || player_pos == 8){
+      
+    }
+
+
+
+    //end of collision testing
   }
   
 
