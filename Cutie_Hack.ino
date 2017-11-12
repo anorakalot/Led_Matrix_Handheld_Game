@@ -1,7 +1,6 @@
 #include "LedControlMS.h"
 #define NBR_MTX 1
 
-
 //too use with the button
 int led_input_1;
 int led_input_2;
@@ -39,15 +38,8 @@ byte enemy_bytes[]=
 
 byte enemy_byte_clear;
 
-
 //enemy initializes for random enemy spawning
 int enemy_byte_random;
-
-//making arduino timer
-//SimpleTimer timer;
-
-
-
 
 //set the LEDControl Variable to be using a single led matrix
 LedControl lc = LedControl(12,11,10,1);
@@ -56,7 +48,6 @@ void setup() {
   randomSeed(analogRead(0));
   //LedControl lc = LedControl(12,11,10,NBR_MTX);
   
-
   //setting up variables
   led_input_1 = 7;
   led_input_2 = 4;
@@ -77,7 +68,6 @@ void setup() {
   pinMode(led_input_2,INPUT);
   
 
-  
   //LedControl lc = LedControl(12,11,10,NBR_MTX);
   Serial.begin(9600);
   Serial.println("setup");
@@ -131,14 +121,9 @@ void calibration(){
 }
 
 
-
-
-
-void loop() {
-  while (checker){
-  //PLAYER INPUT CASES
-  //move player right
-  if (digitalRead(led_input_1) == HIGH){
+//right input
+  void right_input(){
+    if (digitalRead(led_input_1) == HIGH){
     //out of bounds checking
     if (player_pos + 1 >7){
       NULL;
@@ -147,9 +132,12 @@ void loop() {
     lc.setLed(0,player_pos,0,false);
     player_pos ++;
     lc.setLed(0,player_pos,0,true);
+      }
     }
   }
-  //move player left
+
+
+void left_input(){
   if (digitalRead(led_input_2) == HIGH){
     //out of bounds checking
     if (player_pos - 1 < 0){
@@ -161,25 +149,10 @@ void loop() {
     lc.setLed(0,player_pos,0,true);
     }
   }
-  
-  //Moving enemies and checking for collision
-  lc.setColumn(0,enemy_level,enemy_bytes[enemy_byte_random]);
-  lc.setLed(0,player_pos,0,true);
-  
-  //NEED THIS TO DECIDE GAME SPEED
-  delay(game_speed);
-  lc.setColumn(0,enemy_level,enemy_byte_clear);
-  enemy_level --;
-  
-  //WHEN ENEMY OBJECTS GO OFF SCREEN HAVE THIS
-  if (enemy_level < 0){
-    enemy_level = 7;
-    enemy_byte_random = random(0,13);
-    score ++;
-  }
-  
-  //COLLISION TESTING
-  if (enemy_level == 0){
+}
+
+void collision(){
+   if (enemy_level == 0){
     
     if (enemy_bytes[enemy_byte_random] == B00000011 && (player_pos == 6 || player_pos == 7)){
       game_over();
@@ -236,6 +209,33 @@ void loop() {
     }
     //end of collision testing
   }
+}
+
+
+void loop() {
+  while (checker){
+  //PLAYER INPUT 
+  right_input();
+  left_input();
+  
+  //Moving enemies and checking for collision
+  lc.setColumn(0,enemy_level,enemy_bytes[enemy_byte_random]);
+  lc.setLed(0,player_pos,0,true);
+  
+  //NEED THIS TO DECIDE GAME SPEED
+  delay(game_speed);
+  lc.setColumn(0,enemy_level,enemy_byte_clear);
+  enemy_level --;
+  
+  //WHEN ENEMY OBJECTS GO OFF SCREEN HAVE THIS
+  if (enemy_level < 0){
+    enemy_level = 7;
+    enemy_byte_random = random(0,13);
+    score ++;
+  }
+  
+  //COLLISION TESTING
+  collision(); 
 
 
   //increase game_speed based on time elapsed
@@ -247,7 +247,8 @@ void loop() {
   }
 
   game_time ++;
-    //end of while loop
+    //end of  MAIN while loop
+    
   }
   
   if (digitalRead(led_input_1) == HIGH){
