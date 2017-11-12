@@ -1,12 +1,6 @@
-#include <SimpleTimer.h>
-
-#include <LiquidCrystal.h>
-
 #include "LedControlMS.h"
-
 #define NBR_MTX 1
 
-LiquidCrystal lcd(13,9,6,8,3,2);
 
 //too use with the button
 int led_input_1;
@@ -21,11 +15,12 @@ int enemy_level;
 
 int score;
 
-int game_time;
+unsigned long game_time;
 
 //byte values for enemy movement
 byte enemy_bytes[]= 
   {
+  //2 long enemies
   B00000011,
   B00000110,
   B00001100,
@@ -33,6 +28,13 @@ byte enemy_bytes[]=
   B00110000,
   B01100000,
   B11000000,
+  //3 long enemies
+  B00000111,
+  B00001110,
+  B00011100,
+  B00111000,
+  B01110000,
+  B11100000,
   };
 
 byte enemy_byte_clear;
@@ -54,9 +56,6 @@ void setup() {
   randomSeed(analogRead(0));
   //LedControl lc = LedControl(12,11,10,NBR_MTX);
   
-  //TESTING LCD SCREEN
-  lcd.begin(16, 2);
-  lcd.print("Hello World!");
 
   //setting up variables
   led_input_1 = 7;
@@ -68,6 +67,8 @@ void setup() {
   score = 0;
   enemy_byte_clear = B00000000;
 
+
+  game_time = 0;
   //set timers for increasing game speed
   //timer.setInterval(100,game_speed_increase(game_speed));
 
@@ -89,9 +90,8 @@ void setup() {
   //delay(600);
   //setled arguments (coordinates(only rightmost (x,y) and true)
   
-  
-  
-  enemy_byte_random = random(0,7);
+    
+  enemy_byte_random = random(0,13);
 
   calibration();
   //loop();
@@ -135,11 +135,6 @@ void calibration(){
 
 
 void loop() {
-  
-  //game loop
-  //lc.setLed(0,player_pos,0,true);
-  //lc.setLed(
-
   while (checker){
   //PLAYER INPUT CASES
   //move player right
@@ -154,7 +149,6 @@ void loop() {
     lc.setLed(0,player_pos,0,true);
     }
   }
-
   //move player left
   if (digitalRead(led_input_2) == HIGH){
     //out of bounds checking
@@ -168,13 +162,10 @@ void loop() {
     }
   }
   
- 
-  
   //Moving enemies and checking for collision
-  
-  
   lc.setColumn(0,enemy_level,enemy_bytes[enemy_byte_random]);
   lc.setLed(0,player_pos,0,true);
+  
   //NEED THIS TO DECIDE GAME SPEED
   delay(game_speed);
   lc.setColumn(0,enemy_level,enemy_byte_clear);
@@ -183,10 +174,10 @@ void loop() {
   //WHEN ENEMY OBJECTS GO OFF SCREEN HAVE THIS
   if (enemy_level < 0){
     enemy_level = 7;
-    enemy_byte_random = random(0,7);
+    enemy_byte_random = random(0,13);
     score ++;
   }
-
+  
   //COLLISION TESTING
   if (enemy_level == 0){
     
@@ -218,37 +209,44 @@ void loop() {
       game_over();
       checker = false;
     }
+    
+    else if (enemy_bytes[enemy_byte_random] == B00000111 && (player_pos == 5 || player_pos == 6 || player_pos == 7)){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B00001110 && (player_pos == 4 || player_pos == 5 || (player_pos == 6))){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B00011100 && (player_pos == 3 || player_pos == 4 || player_pos == 5)){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B00111000 && (player_pos == 2 || player_pos == 3 || player_pos == 4)){
+      game_over();
+      checker = false;
+    }   
+    else if (enemy_bytes[enemy_byte_random] == B01110000 && (player_pos == 1 || player_pos == 2 || player_pos == 3)){
+      game_over();
+      checker = false;
+    }
+    else if (enemy_bytes[enemy_byte_random] == B11100000 && (player_pos == 0 || player_pos == 1 || player_pos == 2)){
+      game_over();
+      checker = false;
+    }
     //end of collision testing
   }
 
-  game_time = millis() % 100;
-  if (game_time == 0){
-    game_speed -= 10;
+
+  //increase game_speed based on time elapsed
+  if (game_time % 12 == 0){
+    game_speed = game_speed - 10;
   }
-  /*
-  if (game_time > 50000){
-    game_speed = 30;
-    }
-    
-   else if (game_time > 40000){
+  if (game_speed < 50){
     game_speed = 50;
-   }
-   else if (game_time > 30000){
-    game_speed = 75;
-   }
-   else if (game_time > 20000){
-    game_speed = 90;
-   }
-   else if (game_time > 10000){
-    game_speed = 115;
-   }
-   
-   
-   
-   if (game_time > 3000){
-    game_speed = 40;
-   }
-*/
+  }
+
+  game_time ++;
     //end of while loop
   }
   
@@ -263,14 +261,31 @@ void loop() {
 
 
 void game_over(){
-  lc.writeString(0,"Game Over");
+  
+  char score_show = char(score);
+  lc.writeString(0,"Score  ");
+  if (score > 30){
+    lc.writeString(0," Best ");
+  }
+  else if (score > 20){
+    lc.writeString(0," Good ");
+  }
+  else if(score > 10){
+    lc.writeString(0," Ok ");
+  }
+  else{
+    lc.writeString (0, " Bad  " );
+  }
+  
+  //lc.writeString(0,);
+  lc.writeString(0,"Game ");
 }
 
 //TO DO LIST
 //DETECT COLLISION CHECK!!! 
 //RANDOM WORKS CHECK!!!!!
-//REDO OPTION
-//USE LCD SCREEN
+
+
 
 
 //STRECTCH GOALS
