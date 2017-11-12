@@ -13,7 +13,7 @@ int led_input_1;
 int led_input_2;
 
 int player_pos;
-int game_speed;
+long game_speed;
 //game loop variable
 bool checker;
 
@@ -21,7 +21,7 @@ int enemy_level;
 
 int score;
 
-unsigned long game_time;
+int game_time;
 
 //byte values for enemy movement
 byte enemy_bytes[]= 
@@ -37,18 +37,14 @@ byte enemy_bytes[]=
 
 byte enemy_byte_clear;
 
-int zero_time = 0;
 
 //enemy initializes for random enemy spawning
 int enemy_byte_random;
 
 //making arduino timer
-SimpleTimer timer;
+//SimpleTimer timer;
 
-void game_speed_increase(int &game_speed){
-  game_speed -= 10;
-  
-}
+
 
 
 //set the LEDControl Variable to be using a single led matrix
@@ -225,7 +221,10 @@ void loop() {
     //end of collision testing
   }
 
-  game_time = millis();
+  game_time = millis() % 100;
+  if (game_time == 0){
+    game_speed -= 10;
+  }
   /*
   if (game_time > 50000){
     game_speed = 30;
@@ -265,7 +264,6 @@ void loop() {
 
 void game_over(){
   lc.writeString(0,"Game Over");
-  
 }
 
 //TO DO LIST
